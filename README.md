@@ -25,3 +25,7 @@
 ## Criar um novo módulo
 
 nest g module <NOME>
+
+## Cruar um novo controller
+
+nest g controller <NOME>
