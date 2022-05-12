@@ -26,6 +26,10 @@
 
 nest g module <NOME>
 
-## Cruar um novo controller
+## Criar um novo controller
 
 nest g controller <NOME>
+
+## Criar um novo service
+
+nest g service <NOME>
