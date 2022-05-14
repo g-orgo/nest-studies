@@ -5,12 +5,10 @@ import { JogadoresModule } from './jogadores/jogadores.module';
 @Module({
   imports: [
     MongooseModule.forRoot(
-      'mongodb+srv://gabriel-orgo:@Mongodb323@cluster0.4q1qy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+      'mongodb+srv://gabriel-orgo:%40Mongodb323@cluster0.4q1qy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
       {
         useNewUrlParser: true,
-        useCreateIndex: true,
         useUnifiedTopology: true,
-        useFindAndModify: false,
       },
     ),
     JogadoresModule,
