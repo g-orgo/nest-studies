@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { AtualizarJogadorDto } from './dtos/atualizar-jogador.dto';
 import { CriarJogadorDto } from './dtos/criar-jogador.dto';
 import { Jogador } from './interfaces/jogador.interface';
 
@@ -31,7 +32,7 @@ export class JogadoresService {
 
   async atualizarJogador(
     _id: string,
-    criaJogadorDto: CriarJogadorDto,
+    atualizaJogadorDto: AtualizarJogadorDto,
   ): Promise<void> {
     const jogadorEncontrado = await this.jogadorModel.findOne({ _id }).exec();
 
@@ -39,7 +40,7 @@ export class JogadoresService {
       throw new NotFoundException(`Jogador com id ${_id} não encontrado`);
     }
     await this.jogadorModel
-      .findOneAndUpdate({ _id }, { $set: criaJogadorDto })
+      .findOneAndUpdate({ _id }, { $set: atualizaJogadorDto })
       .exec();
   }
 
@@ -54,7 +55,7 @@ export class JogadoresService {
     return await this.jogadorModel.find().exec();
   }
 
-  async deletarJogador(email: string): Promise<any> {
-    return await this.jogadorModel.deleteOne({ email }).exec();
+  async deletarJogador(_id: string): Promise<any> {
+    return await this.jogadorModel.deleteOne({ _id }).exec();
   }
 }
