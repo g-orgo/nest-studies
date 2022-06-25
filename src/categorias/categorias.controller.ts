@@ -46,9 +46,16 @@ export class CategoriasController {
   }
 
   @Post('/:categoria/jogadores/:idJogador')
-  async atribuirCategoriaJogador(
-    @Param() params: string[]
-  ): Promise<void>{
-    return await this.categoriasService.atribuirCategoriaJogador(params)
+  async atribuirCategoriaJogador(@Param() params: string[]): Promise<void> {
+    return await this.categoriasService.atribuirCategoriaJogador(params);
+  }
+
+  @Get('/jogadores/:idJogador')
+  async consultarCategoriaPorJogador(
+    @Param('idJogador') idJogador: string,
+  ): Promise<Categoria[]> {
+    return await this.categoriasService.consultarCategoriaPorJogador(
+      idJogador,
+    );
   }
 }

@@ -96,4 +96,13 @@ export class CategoriasService {
       .findOneAndUpdate({ categoria }, { $set: categoriaEncontrada })
       .exec();
   }
+
+  async consultarCategoriaPorJogador(idJogador: string): Promise<Categoria[]> {
+    const categoriaExistente = await this.categoriaModel
+      .find({
+        jogadores: idJogador,
+      })
+      .exec();
+    return categoriaExistente;
+  }
 }
