@@ -103,6 +103,8 @@ export class CategoriasService {
         jogadores: idJogador,
       })
       .exec();
+
+    if (!categoriaExistente) throw undefined;
     return categoriaExistente;
   }
 }

@@ -16,15 +16,17 @@ export class DesafiosService {
   ) {}
 
   async criarDesafio(criarDesafioDto: CriarDesafioDTO): Promise<Desafio> {
-    const { jogadores, solicitante, dataHoraDesafio } = criarDesafioDto;
+    const { jogadores, solicitante } = criarDesafioDto;
 
-    const jogadoresDoDesafio =
-      await this.jogadoresService.consultarTodosJogadores();
+    const desafiante1 = jogadores[0];
+    const desafiante2 = jogadores[1];
 
-    const jogadorComCategoria =
-      await this.categoriasService.consultarTodasCategorias();
+    const desafioCriado = new this.desafioModel(criarDesafioDto);
 
-    if (!jogadoresDoDesafio) {
+    if (
+      !this.jogadoresService.consultarJogadorPeloId(desafiante1._id) &&
+      !this.jogadoresService.consultarJogadorPeloId(desafiante2._id)
+    ) {
       /**
        * ? Caso nenhum jogador do desafio tenha registro no sistema
        */
@@ -34,9 +36,7 @@ export class DesafiosService {
     }
 
     if (
-      !jogadores.some(
-        (elementInIt: Jogador) => elementInIt._id === solicitante._id,
-      )
+      !jogadores.some((jogador: Jogador) => jogador._id === solicitante._id)
     ) {
       /**
        * ? O solicitante tem que estar presente como participante do desafio
@@ -46,6 +46,22 @@ export class DesafiosService {
       );
     }
 
-    return;
+    if (
+      (
+        await this.categoriasService.consultarCategoriaPorJogador(
+          solicitante._id,
+        )
+      ).length === 0
+    ) {
+      /**
+       * ? Caso o jogador não esteja presente em nenhuma categoria
+       */
+
+      throw new BadRequestException(
+        `O Solicitante ${solicitante.nome} não está presente em nenhuma categoria`,
+      );
+    }
+
+    return desafioCriado.save();
   }
 }
