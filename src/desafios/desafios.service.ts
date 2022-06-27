@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Desafio } from './interface/desafio.interface';
 import { CriarDesafioDTO } from './dtos/criar-desafio.dto';
@@ -6,6 +6,7 @@ import { CategoriasService } from 'src/categorias/categorias.service';
 import { JogadoresService } from 'src/jogadores/jogadores.service';
 import { Jogador } from 'src/jogadores/interfaces/jogador.interface';
 import { Model } from 'mongoose';
+import { DesafioStatus } from './interface/desafio-status.enum';
 
 @Injectable()
 export class DesafiosService {
@@ -16,12 +17,17 @@ export class DesafiosService {
   ) {}
 
   async criarDesafio(criarDesafioDto: CriarDesafioDTO): Promise<Desafio> {
-    const { jogadores, solicitante } = criarDesafioDto;
+    const { jogadores, solicitante, dataHoraDesafio } = criarDesafioDto;
 
     const desafiante1 = jogadores[0];
     const desafiante2 = jogadores[1];
 
     const desafioCriado = new this.desafioModel(criarDesafioDto);
+    // desafioCriado.status = PENDENTE;
+    const arrayCategoriaDoSolicitante =
+      await this.categoriasService.consultarCategoriaPorJogador(
+        solicitante._id,
+      );
 
     if (
       !this.jogadoresService.consultarJogadorPeloId(desafiante1._id) &&
@@ -46,13 +52,7 @@ export class DesafiosService {
       );
     }
 
-    if (
-      (
-        await this.categoriasService.consultarCategoriaPorJogador(
-          solicitante._id,
-        )
-      ).length === 0
-    ) {
+    if (arrayCategoriaDoSolicitante.length === 0) {
       /**
        * ? Caso o jogador não esteja presente em nenhuma categoria
        */
@@ -61,6 +61,10 @@ export class DesafiosService {
         `O Solicitante ${solicitante.nome} não está presente em nenhuma categoria`,
       );
     }
+
+    new Logger().log(
+      `Jogador da categoria ${arrayCategoriaDoSolicitante} solicitou um desafio às ${dataHoraDesafio}`,
+    );
 
     return desafioCriado.save();
   }

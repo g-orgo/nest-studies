@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   UsePipes,
   ValidationPipe,
@@ -19,5 +20,10 @@ export class DesafiosController {
     @Body() criarDesafioDto: CriarDesafioDTO,
   ): Promise<Desafio> {
     return await this.desafioService.criarDesafio(criarDesafioDto);
+  }
+
+  @Get()
+  async consultarDesafios(): Promise<Desafio[]> {
+    return await this.desafioService.consultarTodosDesafios();
   }
 }
