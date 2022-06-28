@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Desafio } from './interface/desafio.interface';
 import { CriarDesafioDTO } from './dtos/criar-desafio.dto';
@@ -7,6 +12,7 @@ import { JogadoresService } from 'src/jogadores/jogadores.service';
 import { Jogador } from 'src/jogadores/interfaces/jogador.interface';
 import { Model } from 'mongoose';
 import { DesafioStatus } from './interface/desafio-status.enum';
+import { exec } from 'child_process';
 
 @Injectable()
 export class DesafiosService {
@@ -23,7 +29,7 @@ export class DesafiosService {
     const desafiante2 = jogadores[1];
 
     const desafioCriado = new this.desafioModel(criarDesafioDto);
-    // desafioCriado.status = PENDENTE;
+    desafioCriado.status = 'PENDENTE';
     const arrayCategoriaDoSolicitante =
       await this.categoriasService.consultarCategoriaPorJogador(
         solicitante._id,
@@ -36,7 +42,7 @@ export class DesafiosService {
       /**
        * ? Caso nenhum jogador do desafio tenha registro no sistema
        */
-      throw new BadRequestException(
+      throw new NotFoundException(
         `Não há nenhum jogador citado para o desafio em nosso banco.`,
       );
     }
@@ -66,6 +72,51 @@ export class DesafiosService {
       `Jogador da categoria ${arrayCategoriaDoSolicitante} solicitou um desafio às ${dataHoraDesafio}`,
     );
 
-    return desafioCriado.save();
+    return await desafioCriado.save();
+  }
+
+  async consultarDesafios(idJogador?: string): Promise<Array<Desafio>> {
+    if (idJogador) {
+      /**
+       * ? Caso exista um id de jogador para ser consultado
+       */
+
+      if (!this.jogadoresService.consultarJogadorPeloId(idJogador))
+        throw new NotFoundException(`O solicitante ${idJogador} não existe`);
+
+      return await this.desafioModel
+        .find({})
+        .where('jogadores')
+        .in([idJogador])
+        .populate('jogadores')
+        .exec();
+    } else {
+      /**
+       * ? Caso não exista um id de jogador para ser consultado
+       */
+      return await this.desafioModel.find().populate('jogadores').exec();
+    }
+  }
+
+  async deletarDesafio(idDesafio: string): Promise<Desafio> {
+    if (
+      !(await this.desafioModel.find({}).exec()).some(
+        (desafio: Desafio) => desafio._id === idDesafio,
+      )
+    )
+      throw new NotFoundException(`O desafio ${idDesafio} não existe`);
+
+    const desafioParaSerCanceladoAtualizado = await this.desafioModel
+      .findOne({
+        _id: idDesafio,
+      })
+      .exec();
+
+    desafioParaSerCanceladoAtualizado.status = 'CANCELADO';
+
+    this.desafioModel
+      .findOneAndUpdate({ idDesafio, $set: desafioParaSerCanceladoAtualizado })
+      .exec();
+    return desafioParaSerCanceladoAtualizado;
   }
 }

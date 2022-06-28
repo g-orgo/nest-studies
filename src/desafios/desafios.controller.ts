@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   UsePipes,
   ValidationPipe,
@@ -24,6 +26,20 @@ export class DesafiosController {
 
   @Get()
   async consultarDesafios(): Promise<Desafio[]> {
-    return await this.desafioService.consultarTodosDesafios();
+    return await this.desafioService.consultarDesafios();
+  }
+
+  @Get('/jogadores/:idJogador')
+  async consultarDesafiosDoJogador(
+    @Param('idJogador') idJogador: string,
+  ): Promise<Desafio[]> {
+    return await this.desafioService.consultarDesafios(idJogador);
+  }
+
+  @Delete('/:idDesafio')
+  async deletarDesafio(
+    @Param('idDesafio') idDesafio: string,
+  ): Promise<Desafio> {
+    return await this.desafioService.deletarDesafio(idDesafio);
   }
 }

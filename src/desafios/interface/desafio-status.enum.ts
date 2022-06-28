@@ -1,7 +1,6 @@
-export enum DesafioStatus {
-  REALIZADO = 'REALIZADO',
-  PENDENTE = 'PENDENTE',
-  ACEITO = 'ACEITO',
-  NEGADO = 'NEGADO',
-  CANCELADO = 'CANCELADO',
-}
+export type DesafioStatus =
+  | 'REALIZADO'
+  | 'PENDENTE'
+  | 'ACEITO'
+  | 'NEGADO'
+  | 'CANCELADO';
