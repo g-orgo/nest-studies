@@ -12,7 +12,6 @@ import { JogadoresService } from 'src/jogadores/jogadores.service';
 import { Jogador } from 'src/jogadores/interfaces/jogador.interface';
 import { Model } from 'mongoose';
 import { DesafioStatus } from './interface/desafio-status.enum';
-import { exec } from 'child_process';
 
 @Injectable()
 export class DesafiosService {
@@ -29,7 +28,7 @@ export class DesafiosService {
     const desafiante2 = jogadores[1];
 
     const desafioCriado = new this.desafioModel(criarDesafioDto);
-    desafioCriado.status = 'PENDENTE';
+    desafioCriado.status = DesafioStatus.PENDENTE;
     const arrayCategoriaDoSolicitante =
       await this.categoriasService.consultarCategoriaPorJogador(
         solicitante._id,
@@ -112,7 +111,7 @@ export class DesafiosService {
       })
       .exec();
 
-    desafioParaSerCanceladoAtualizado.status = 'CANCELADO';
+    desafioParaSerCanceladoAtualizado.status = DesafioStatus.CANCELADO;
 
     this.desafioModel
       .findOneAndUpdate({ idDesafio, $set: desafioParaSerCanceladoAtualizado })
