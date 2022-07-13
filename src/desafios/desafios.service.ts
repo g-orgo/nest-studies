@@ -12,6 +12,7 @@ import { JogadoresService } from 'src/jogadores/jogadores.service';
 import { Jogador } from 'src/jogadores/interfaces/jogador.interface';
 import { Model } from 'mongoose';
 import { DesafioStatus } from './interface/desafio-status.enum';
+import { PartidasService } from 'src/partidas/partidas.service';
 
 @Injectable()
 export class DesafiosService {
@@ -19,6 +20,7 @@ export class DesafiosService {
     @InjectModel('Desafios') private readonly desafioModel: Model<Desafio>,
     private readonly jogadoresService: JogadoresService,
     private readonly categoriasService: CategoriasService,
+    private readonly partidasService: PartidasService,
   ) {}
 
   async criarDesafio(criarDesafioDto: CriarDesafioDTO): Promise<Desafio> {
@@ -117,5 +119,43 @@ export class DesafiosService {
       .findOneAndUpdate({ idDesafio, $set: desafioParaSerCanceladoAtualizado })
       .exec();
     return desafioParaSerCanceladoAtualizado;
+  }
+
+  async atribuirDesafioNaPartida(
+    idDesafio: string,
+    idPartida: string,
+  ): Promise<void> {
+    if (
+      !(await this.desafioModel.find({}).exec()).some(
+        (desafio: Desafio) => desafio._id === idDesafio,
+      )
+    ) {
+      /**
+       * ? Caso o id do desafio não seja encontrado
+       */
+      throw new NotFoundException(`O desafio ${idDesafio} não existe`);
+    }
+    if (
+      !(await this.desafioModel.find({}).exec()).some(
+        (desafio: Desafio) => desafio._id === idDesafio,
+      )
+    ) {
+      /**
+       * ? Caso o id da partida não seja encontrado
+       */
+      throw new NotFoundException(`A partida ${idPartida} não existe`);
+    }
+
+    // const partida = await this.partidasService
+
+    // const desafioAtualizado = await this.desafioModel
+    //   .findOne({
+    //     _id: idDesafio,
+    //   })
+    //   .exec();
+
+    // desafioAtualizado.partida
+
+    // this.desafioModel.findOneAndUpdate({ idDesafio, $ });
   }
 }

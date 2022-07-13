@@ -24,6 +24,15 @@ export class DesafiosController {
     return await this.desafioService.criarDesafio(criarDesafioDto);
   }
 
+  @Post('/:idDesafio/partida/:idPartida')
+  @UsePipes(ValidationPipe)
+  async atribuirDesafioNaPartida(
+    @Param('idDesafio') idDesafio: string,
+    @Param('idPartida') idPartida: string,
+  ): Promise<void> {
+    await this.desafioService.atribuirDesafioNaPartida(idDesafio, idPartida);
+  }
+
   @Get()
   async consultarDesafios(): Promise<Desafio[]> {
     return await this.desafioService.consultarDesafios();
